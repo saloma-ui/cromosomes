@@ -20,30 +20,33 @@
       --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
     }
     *{ box-sizing: border-box; }
+
     body{
-      background:
-    radial-gradient(1200px 600px at 20% 10%, rgba(96,165,250,0.25), transparent 60%),
-    radial-gradient(900px 500px at 80% 30%, rgba(54,211,153,0.18), transparent 60%),
-    radial-gradient(900px 500px at 50% 90%, rgba(248,114,114,0.16), transparent 60%),
-    url("assets/adn.png");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-attachment: fixed;    
       margin:0;
       min-height:100vh;
       font-family: var(--sans);
       color: var(--text);
+
+      /* ✅ FONS AMB IMATGE + CAPA FOSCA + GRADIENTS */
       background:
+        linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.45)),
+        url("./assets/adn.png"),
         radial-gradient(1200px 600px at 20% 10%, rgba(96,165,250,0.25), transparent 60%),
         radial-gradient(900px 500px at 80% 30%, rgba(54,211,153,0.18), transparent 60%),
         radial-gradient(900px 500px at 50% 90%, rgba(248,114,114,0.16), transparent 60%),
         var(--bg);
+
+      background-size: cover, cover, auto, auto, auto, auto;
+      background-position: center, center, center, center, center, center;
+      background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat;
+      background-attachment: fixed, fixed, fixed, fixed, fixed, fixed;
+
       display:flex;
       align-items:center;
       justify-content:center;
       padding: 22px;
     }
+
     .app{ width: min(920px, 100%); display:grid; gap: 14px; }
     header{
       display:flex; gap: 12px; align-items:center; justify-content:space-between;
@@ -411,7 +414,6 @@
     }
   ];
 
-  // Utilitats
   const shuffle = (arr) => {
     const a = arr.slice();
     for (let i = a.length - 1; i > 0; i--) {
@@ -421,15 +423,13 @@
     return a;
   };
 
-  // Estat
   let order = [];
   let current = 0;
   let score = 0;
   let correct = 0;
   let answered = false;
-  let reviewLog = []; // {qText, chosenText, correctText, ok, explain}
+  let reviewLog = [];
 
-  // Elements
   const elScore = document.getElementById("score");
   const elCorrect = document.getElementById("correct");
   const elQIndex = document.getElementById("qIndex");
@@ -477,10 +477,9 @@
     const progressPct = (current / questions.length) * 100;
     elProgress.style.width = progressPct.toFixed(0) + "%";
 
-    // Barreja opcions (manté resposta correcta per key)
     const shuffledOptions = shuffle(q.options).map((opt, idx) => ({
       ...opt,
-      shownLetter: String(idx + 1) // 1..4 per teclat
+      shownLetter: String(idx + 1)
     }));
 
     elOptions.innerHTML = "";
@@ -501,20 +500,19 @@
       btn.appendChild(letter);
       btn.appendChild(span);
 
-      btn.addEventListener("click", () => choose(opt.key, opt.text, shuffledOptions));
+      btn.addEventListener("click", () => choose(opt.key, opt.text));
 
       elOptions.appendChild(btn);
     });
   }
 
-  function choose(chosenKey, chosenText, shuffledOptions){
+  function choose(chosenKey, chosenText){
     if (answered) return;
     answered = true;
 
     const q = questions[order[current]];
     const ok = chosenKey === q.answerKey;
 
-    // Deshabilita tots els botons i marca correcte/incorrecte
     const buttons = Array.from(elOptions.querySelectorAll("button.option"));
     buttons.forEach((b) => {
       b.disabled = true;
@@ -546,25 +544,14 @@
       elStatusBadge.style.borderColor = "rgba(248,114,114,0.55)";
     }
 
-    // Log per revisió final
     const correctText = q.options.find(o => o.key === q.answerKey).text;
-    reviewLog.push({
-      qText: q.text,
-      chosenText,
-      correctText,
-      ok,
-      explain: q.explain
-    });
+    reviewLog.push({ qText: q.text, chosenText, correctText, ok, explain: q.explain });
 
     elScore.textContent = String(score);
     elCorrect.textContent = String(correct);
 
     elNext.disabled = false;
     elNext.focus();
-    updateProgressAfterAnswer();
-  }
-
-  function updateProgressAfterAnswer(){
     const pct = ((current + 1) / questions.length) * 100;
     elProgress.style.width = pct.toFixed(0) + "%";
   }
@@ -632,7 +619,6 @@
       .replaceAll("'", "&#039;");
   }
 
-  // Controls de teclat: 1–4 per contestar, N per següent
   document.addEventListener("keydown", (e) => {
     const key = e.key.toLowerCase();
     if (key === "n") {
@@ -647,16 +633,11 @@
     }
   });
 
-  // Botons
   elNext.addEventListener("click", next);
   elRestart.addEventListener("click", resetGame);
 
-  // Inici
   resetGame();
 })();
 </script>
 </body>
 </html>
-
-
-
